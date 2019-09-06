@@ -226,7 +226,7 @@ class DomainBigData:
         if len(soup) == 3:
             soup_img = soup[1].findAll('img')
             if len(soup_img) == 1:
-                name = soup[1].contents[1]
+                name = soup[0].contents[0]
             else:
                 name = soup[1].string
         elif len(soup) == 2:
@@ -241,7 +241,7 @@ class DomainBigData:
         if len(soup) == 3:
             soup_img = soup[1].findAll('img')
             if len(soup_img) == 1:
-                return soup[1].contents[1]
+                return soup[0].contents[0]
             else:
                 return soup[1].string
         elif len(soup) == 2:
