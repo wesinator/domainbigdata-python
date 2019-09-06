@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # https://github.com/crits/crits_services/blob/3dff56e7111439c4156a8408f178fd484df76feb/domainbigdata_service/domainbigdata.py
 
 ###############################################################################
