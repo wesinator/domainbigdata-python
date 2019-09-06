@@ -30,62 +30,64 @@
 #                along with OSTrICa. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 ###############################################################################
-import sys
-import string
-import re
+import requests
 from bs4 import BeautifulSoup
 
-import requests
+HEADERS = {'User-Agent': "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko"}
 
-headers = {'User-Agent': "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko"}
+
+# request URL, return contents (utf-8)
+def request(url):
+    print(url)
+    r = requests.get(url, headers=HEADERS)
+    status = r.status_code
+    if status == 200:
+        content = r.text.encode('utf8')
+        return content
+    else:
+        print(status)
+        return None
+
 
 class DomainBigData:
-
     host = "domainbigdata.com"
+
 
     def __init__(self):
         self.intelligence = {}
         self.index_value = ''
         self.intelligence_list = []
-        pass
+
 
     def __del__(self):
         self.intelligence = {}
 
-    def email_information(self, email, log):
+
+    def email_lookup(self, email):
+        # query domainbigdata and parse result HTML
         query = '/email/%s' % (email)
-        url = "https://%s%s"%(self.host,query) # double slash will have different results
-        print(url)
-        r = requests.get(url, headers=headers)
-        if r.status_code == 200:
-            content = r.text.encode('utf8')
-            #print(content[:25])
-            self.collect_email_intelligence(content)
-            return self.intelligence
-        else:
-            print(r.status_code)
-            return None
+        url = "https://%s%s" % (self.host, query) # double slash will have different results
+        self.intelligence['url'] = url
+        content = request(url)
+
+        self.collect_email_intelligence(content)
+
+        # append email to intel struct
+        # doing this following collect_email_intelligence to update registrant email field if empty
+        self.intelligence['registrant_email'] = email
+
 
     def collect_email_intelligence(self, server_response):
         soup = BeautifulSoup(server_response, 'html.parser')
-        #print("In collect_email_intelligence")
         associated_sites = soup.findAll('table', {'class': 't1'})
-        #print("site table: %s" % associated_sites)
 
         if len(associated_sites) == 1:
             self.extract_associated_sites(associated_sites[0].tbody)
 
-        name_soup = soup.findAll('tr', {'id':'trRegistrantName'})
-        #print("registrant name: %s" % name_soup)
-        if len(name_soup) == 1:
-            email2name = self.extract_information_from_dd(name_soup[0])
-            self.intelligence['Domain_For_Name'] = email2name
+        records = soup.findAll('div', {'id':'MainMaster_divRegistrantIDCard'})
+        if len(records) == 1:
+            self.collect_registrant_information(records[0])
 
-        org_soup = soup.findAll('tr', {'id':'trRegistrantName'})
-        #print("registrant org: %s" % org_soup)
-        if len(org_soup) == 1:
-            email2org = self.extract_information_from_dd(org_soup[0])
-            self.intelligence['Domain_For_Org'] = email2org
 
     def extract_associated_sites(self, soup):
         associated_sites = []
@@ -103,23 +105,26 @@ class DomainBigData:
             elif idx == 2:
                 registrar = site.get_text()
                 idx = 0
-                associated_sites.append({'associated_site':associated_site, 'creation_date':creation_date, 'registrar':registrar})
+                associated_sites.append(
+                {'domain':associated_site,
+                'creation_date':creation_date,
+                'registrar':registrar}
+                )
                 continue
-        self.intelligence['associated_sites'] = associated_sites
+        self.intelligence['associated_domains'] = associated_sites
+
 
     def name2dom_collect_information(self, url):
-        r = requests.get(url, headers=headers)
-        if r.status_code == 200:
-            content = r.text.encode('utf8')
-            return self.collect_email2dom_intelligence(content)
-        else:
-            return None
+        content = request(url)
+        return self.collect_email2dom_intelligence(content)
+
 
     def collect_email2dom_intelligence(self, server_response):
         soup = BeautifulSoup(server_response, 'html.parser')
         associated_sites = soup.findAll('table', {'class':'t1'})
         if len(associated_sites) == 1:
             return self.extract_associated_sites2nj(associated_sites[0].tbody)
+
 
     def extract_associated_sites2nj(self, soup):
         associated_sites = []
@@ -137,20 +142,22 @@ class DomainBigData:
             elif idx == 2:
                 registrar = site.get_text()
                 idx = 0
-                associated_sites.append({'associated_site':associated_site, 'creation_date':creation_date, 'registrar':registrar})
+                associated_sites.append(
+                    {'domain':associated_site,
+                    'creation_date':creation_date,
+                    'registrar':registrar}
+                    )
                 continue
         return associated_sites
 
-    def domain_information(self, domain, log):
+
+    def domain_lookup(self, domain):
         query = '/%s' % (domain)
-        url = "http://%s%s"%(self.host,query)
-        r = requests.get(url, headers=headers)
-        if r.status_code == 200:
-            content = r.text.encode('utf8')
-            self.collect_domain_intelligence(content)
-            return self.intelligence
-        else:
-            return None
+        url = "https://%s%s" % (self.host,query)
+        content = request(url)
+        self.collect_domain_intelligence(content)
+        return self.intelligence
+
 
     def collect_domain_intelligence(self, server_response):
         soup = BeautifulSoup(server_response, 'html.parser')
@@ -172,6 +179,7 @@ class DomainBigData:
         if len(records) == 1:
             self.collect_registrant_information(records[0])
 
+
     def collect_registrant_information(self, soup):
         registrant_organization = ''
         registrant_email = ''
@@ -190,17 +198,17 @@ class DomainBigData:
         if len(organization_soup) == 1:
             registrant_organization = self.extract_information_from_registrant(organization_soup[0])
             orgdom = self.extract_information_from_dd(organization_soup[0])
-            self.intelligence['Domain_For_Org'] = orgdom
+            self.intelligence['org_associated_domains'] = orgdom
 
         if len(email_soup) == 1:
             registrant_email = self.extract_information_from_registrant(email_soup[0])
             emaildom = self.extract_information_from_dd(email_soup[0])
-            self.intelligence['Domain_For_Email'] = emaildom
+            self.intelligence['email_associated_domains'] = emaildom
 
         if len(name_soup) == 1:
             registrant_name = self.extract_information_from_registrant(name_soup[0])
             namedom = self.extract_information_from_dd(name_soup[0])
-            self.intelligence['Domain_For_Name'] = namedom
+            self.intelligence['name_associated_domains'] = namedom
 
         if len(city_soup) == 1:
             registrant_city = self.extract_information_from_registrant(city_soup[0])
@@ -211,12 +219,13 @@ class DomainBigData:
         if len(phone_soup) == 1:
             registrant_phone = self.extract_information_from_registrant(phone_soup[0])
 
-        self.intelligence['organization'] = registrant_organization
-        self.intelligence['email'] = registrant_email
+        self.intelligence['registrant_org'] = registrant_organization
+        self.intelligence['registrant_email'] = registrant_email
         self.intelligence['registrant_name'] = registrant_name
         self.intelligence['registrant_city'] = registrant_city
         self.intelligence['registrant_country'] = registrant_country
         self.intelligence['registrant_phone'] = registrant_phone
+
 
     def extract_information_from_dd(self, soup):
         soup = soup.findAll('td')
@@ -233,8 +242,9 @@ class DomainBigData:
             name = soup[1].string
         #get dom
         if link:
-            domains = self.name2dom_collect_information("http://%s%s"%(self.host,link))
+            domains = self.name2dom_collect_information("https://%s%s" % (self.host, link))
             return {name: domains}
+
 
     def extract_information_from_registrant(self, soup):
         soup = soup.findAll('td')
@@ -248,6 +258,7 @@ class DomainBigData:
             return soup[1].string
         return ''
 
+
     def extract_associated_records(self, soups):
         associated_records = []
         for soup in soups:
@@ -256,9 +267,11 @@ class DomainBigData:
             self.intelligence[self.index_value] = self.intelligence_list
             self.intelligence_list = []
 
+
     def extract_trs(self, soup):
         for tr in soup:
             self.extract_tds(tr)
+
 
     def extract_tds(self, soup):
         idx = True # idx flags the type of record that will be added in the dictionary if True
