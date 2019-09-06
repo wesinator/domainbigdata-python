@@ -229,8 +229,7 @@ class DomainBigData:
 
     def extract_information_from_dd(self, soup):
         soup = soup.findAll('td')
-        link = None
-        link = soup[1].find('a').get('href')
+        link = soup[1].find('a')
         name = ''
         if len(soup) == 3:
             soup_img = soup[1].findAll('img')
@@ -242,6 +241,7 @@ class DomainBigData:
             name = soup[1].string
         #get dom
         if link:
+            link = link.get('href')
             domains = self.name2dom_collect_information("https://%s%s" % (self.host, link))
             return {name: domains}
 
