@@ -7,11 +7,15 @@ Adopted from https://github.com/crits/crits_services/blob/3dff56e7111439c4156a84
 ### Usage
 ```python
 from domainbigdata import DomainBigData
+import json
 
 d = DomainBigData()
 email = "dns-admin@google.com"
 
-d.email_information(email, None)
-print(d.intelligence)
+d.email_lookup(email)
+
 #print(d.intelligence_list)
+data = d.intelligence
+
+json.dumps(data)
 ```
