@@ -3,5 +3,6 @@
 
 from .domainbigdata import request, DomainBigData
 
-__author__ = """wesinator"""
-__version__ = '0.1.0'
+__author__ = 'wesinator'
+__version__ = '0.1.1'
+

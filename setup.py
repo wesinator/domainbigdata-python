@@ -7,7 +7,7 @@ with open('LICENSE') as license_file:
     license = license_file.read()
 
 setup(name='domainbigdata',
-      version='0.1',
+      version='0.1.1',
       description='Python wrapper for DomainBigData.com (no API available)',
       long_description=readme,
       long_description_content_type='text/markdown',
