@@ -33,13 +33,11 @@
 import requests
 from bs4 import BeautifulSoup
 
-HEADERS = {'User-Agent': "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko"}
-
 
 # request URL, return contents (utf-8)
 def request(url):
     print(url)
-    r = requests.get(url, headers=HEADERS)
+    r = requests.get(url)
     status = r.status_code
     if status == 200:
         content = r.text.encode('utf8')
