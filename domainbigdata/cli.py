@@ -23,10 +23,10 @@ def main(version, email, domain):
         print("domainbigdata version: {}".format(VERSION))
     elif email:
         data = domainbigdata.email_lookup(email)
-        out = json.dumps(data.__dict__)
+        out = json.dumps(data.__dict__, indent=4)
     elif domain:
         data = domainbigdata.domain_lookup(domain)
-        out = json.dumps(data.__dict__)
+        out = json.dumps(data.__dict__, indent=4)
     print(out)
 
 if __name__ == "__main__":
