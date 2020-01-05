@@ -7,8 +7,14 @@ with open('README.md') as readme_file:
 with open('LICENSE') as license_file:
     license = license_file.read()
 
+requirements = [
+    "beautifulsoup4"
+    "click",
+    "requests"
+]
+
 setup(name='domainbigdata',
-      version='1.0.2',
+      version='1.1.0',
       description='Python wrapper for DomainBigData.com (no API available)',
       long_description=readme,
       long_description_content_type='text/markdown',
@@ -16,6 +22,7 @@ setup(name='domainbigdata',
       author='wesinator',
       keywords='domainbigdata',
       packages=['domainbigdata'],
+      install_requires=requirements,
       entry_points={
         'console_scripts': [
             'domainbigdata=domainbigdata.cli:main',

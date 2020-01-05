@@ -4,4 +4,4 @@
 from .domainbigdata import domain_lookup, email_lookup
 
 __author__ = 'wesinator'
-__version__ = '1.0.2'
+__version__ = '1.1.0'
