@@ -8,9 +8,9 @@ with open('LICENSE') as license_file:
     license = license_file.read()
 
 requirements = [
-    "beautifulsoup4"
+    "beautifulsoup4",
     "click",
-    "requests"
+    "requests",
 ]
 
 setup(name='domainbigdata',
