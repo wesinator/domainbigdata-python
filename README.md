@@ -15,10 +15,10 @@ import json
 
 email = "dns-admin@google.com"
 email_registrations = domainbigdata.email_lookup(email)
-json.dumps(email_registrations.__dict__)
+json.dumps(email_registrations.domains)
 
 # domains may not always have full registrant info
 domain = "example.com"
 domain_reg = domainbigdata.domain_lookup(domain)
-json.dumps(domain_reg.__dict__)
+json.dumps(domain_reg.registrant_info)
 ```

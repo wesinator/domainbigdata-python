@@ -19,16 +19,10 @@ class DomainBigDataResult:
         self.registrant = registrant
 
 # EmailWhois subresult, with list of domain data (domain reg info)
-class DomainBigDataEmailWhois(DomainBigDataResult):
+class DomainBigDataReverseWhois(DomainBigDataResult):
     def __init__(self, url, name, registrant, domains=[]):
         DomainBigDataResult.__init__(self, url, name, registrant)
         self.domains = domains
-
-# domain lookup info result
-class DomainBigDataDomainInfo(DomainBigDataResult):
-    def __init__(self, url, domain, registrant):
-        DomainBigDataResult.__init__(self, url, domain, registrant)
-        self.domain = domain
 
 
 # request URL, return contents (utf-8)
@@ -58,7 +52,7 @@ def email_lookup(email):
     if registrant_info["registrant_email"] == '':
         registrant_info["registrant_email"] = email
 
-    return DomainBigDataEmailWhois(url, email, registrant_info, domains)
+    return DomainBigDataReverseWhois(url, email, registrant_info, domains)
 
 
 def extract_domains(email_whois_page):
@@ -105,7 +99,7 @@ def domain_lookup(domain):
     content = request(url)
     domain_registrant = collect_registrant_information(content)
 
-    return DomainBigDataDomainInfo(url, domain, domain_registrant)
+    return DomainBigDataResult(url, domain, domain_registrant)
 
 
 def collect_registrant_information(content):
