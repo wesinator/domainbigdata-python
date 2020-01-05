@@ -16,6 +16,11 @@ setup(name='domainbigdata',
       author='wesinator',
       keywords='domainbigdata',
       packages=['domainbigdata'],
+      entry_points={
+        'console_scripts': [
+            'domainbigdata=domainbigdata.cli:main',
+        ],
+      },
       classifiers=[
         'Intended Audience :: Developers',
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
