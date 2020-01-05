@@ -10,16 +10,15 @@ pip install --user domainbigdata
 
 ### Usage
 ```python
-from domainbigdata import DomainBigData
+import domainbigdata
 import json
 
-d = DomainBigData()
 email = "dns-admin@google.com"
+email_registrations = domainbigdata.email_lookup(email)
+json.dumps(email_registrations.__dict__)
 
-d.email_lookup(email)
-
-#print(d.intelligence_list)
-data = d.intelligence
-
-json.dumps(data)
+# domains may not always have full registrant info
+domain = "example.com"
+domain_reg = domainbigdata.domain_lookup(domain)
+json.dumps(domain_reg.__dict__)
 ```
