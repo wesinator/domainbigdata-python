@@ -14,7 +14,7 @@ requirements = [
 ]
 
 setup(name='domainbigdata',
-      version='1.1.0',
+      version='1.1.1',
       description='Python wrapper for DomainBigData.com (no API available)',
       long_description=readme,
       long_description_content_type='text/markdown',
