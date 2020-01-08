@@ -20,5 +20,5 @@ json.dumps(email_registrations.domains)
 # domains may not always have full registrant info
 domain = "example.com"
 domain_reg = domainbigdata.domain_lookup(domain)
-json.dumps(domain_reg.registrant_info)
+json.dumps(domain_reg.registrant)
 ```
